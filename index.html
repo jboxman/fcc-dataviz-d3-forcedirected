@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>FCC: Force Directed Graph</title>
+    <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body>
+    <header>
+      <h1>Force Directed Graph</h1>
+    </header>
+    <div id="chart">
+    </div>
+    <div class="tooltip">
+    </div>
+    <footer>
+      Inspired by <a href=""></a>.
+    </footer>
+
+    <script id="tmpl" type="text/x-jsrender">
+    <div>Name: {{:nodeName}}</div>
+    </script>
+
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js'></script>
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.75/jsrender.min.js'></script>
+    <script src="vendor/ramda.js"></script>
+    <script src="js/index.js"></script>
+
+  </body>
+</html>

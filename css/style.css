@@ -1,0 +1,48 @@
+#chart {
+  margin: 10px;
+  text-align: center;
+}
+svg {
+  border: solid 1px black;
+}
+.node-item {
+  cursor: pointer;
+}
+.node-text {
+  font-size: 12px;
+  font-family: sans-serif;
+  cursor: pointer;
+}
+.label {
+  font-size: 12px;
+}
+
+.tip-name {
+  font-weight: bold;
+}
+
+header, footer {
+  text-align: center;
+  margin-bottom: 0.5em;
+}
+
+footer {
+  border-top: 1px #ECECEC solid;
+  margin: 1em;
+  padding: 0.5em;
+}
+
+/*
+  http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html
+*/
+
+div.tooltip {
+  position: absolute;
+  padding: 1em;
+  font: 12px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+}
