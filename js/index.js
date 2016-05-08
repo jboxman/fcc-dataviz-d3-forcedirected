@@ -44,7 +44,7 @@ $chart = $svg.append('g')
 
 // TODO
 // - Switch to FCC API endpoint
-d3.json('/sample.json', function(err, data) {
+d3.json('./sample.json', function(err, data) {
 
   // Group all links by domain
   var pickKeys = R.map(R.pick(['link', 'author']));
