@@ -17,34 +17,27 @@ Hint: Here's the Camper News Hot Stories API endpoint:
 http://www.freecodecamp.com/news/hot.
 */
 
-// Easy way to define margins
-var margin = {
-    top: 10,
-    right: 70,
-    bottom: 40,
-    left: 40
-  },
-  width = 890 - margin.left - margin.right,
-  height = 600 - margin.top - margin.bottom,
-  $svg,
-  $tooltip,
-  $chart,
-  tmpl;
+var width = 890;
+var height = 600;
+var imageAttributes = {
+  x: 0,
+  y: 0,
+  width: 52,
+  height: 52
+}
+var $svg, $tooltip, $chart, tmpl;
 
 $svg = d3.select('#chart').append('svg');
 $toolTip = d3.select('.tooltip');
 tmpl = $.templates('#tmpl');
 
 $svg.attr({
-  width: width + margin.left + margin.right,
-  height: height + margin.top + margin.bottom
+  width,
+  height
 });
-$chart = $svg.append('g')
-  .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+$chart = $svg.append('g');
 
-// TODO
-// - Switch to FCC API endpoint
-d3.json('./sample.json', function(err, data) {
+d3.json('https://www.freecodecamp.com/news/hot', function(err, data) {
 
   // Group all links by domain
   var pickKeys = R.map(R.pick(['link', 'author']));
@@ -62,6 +55,7 @@ d3.json('./sample.json', function(err, data) {
     return {
       nodeName: v.author.username,
       nodeType: 'camper',
+      nodeElType:'circle',
       nodeImage: v.author.picture
     }
   }, R.uniq(authors));
@@ -72,7 +66,8 @@ d3.json('./sample.json', function(err, data) {
     return {
       nodeName: key,
       nodeType: 'domain',
-      weight: v.length,
+      nodeElType: 'circle',
+      nodeWeight: v.length,
       children:children
     };
   }, domainGroups));
@@ -97,56 +92,79 @@ d3.json('./sample.json', function(err, data) {
   // Filter out any nulls and flatten edge list
   edges = R.flatten(R.filter(v => (!!v), edges));
 
+  // Define background images
+  // Derived from:
+  // http://stackoverflow.com/questions/11496734/add-a-background-image-png-to-a-svg-circle-shape
+  var $def = $svg.append('defs').attr('id', 'defs');
+  $def.selectAll('pattern').data(nodes)
+  .enter()
+  .append('pattern')
+  .attr(imageAttributes)
+  .attr('id', function(v) {
+    return v.nodeName;
+  })
+  .append('svg:image')
+  .attr(imageAttributes)
+  .attr('xlink:href', function(v) {
+    return v.nodeImage;
+  });
+
   var force = d3.layout.force()
     .nodes(nodes)
     .links(edges)
     .size([width, height])
-    .linkDistance(40)
-    .charge(-50)
+    .linkDistance(100)
+    .charge(-100)
+    .gravity(.1)
     .start();
 
   // Interactive Data Visualization for the Web
   // by Scott Murray
   // Published by O'Reilly Media, Inc., 2013
-  var edges = $svg.selectAll("line")
+  var edges = $chart.selectAll('line')
     .data(edges)
     .enter()
-    .append("line")
-    .style("stroke", "#ccc")
-    .style("stroke-width", 1);
+    .append('line')
+    .style('stroke', '#ccc')
+    .style('stroke-width', 1);
 
   // Interactive Data Visualization for the Web
   // by Scott Murray
   // Published by O'Reilly Media, Inc., 2013
-  var nodes = $svg.selectAll("circle")
+  var nodes = $chart.selectAll('circle')
     .data(nodes)
     .enter()
-    .append("circle")
-    .attr("r", 10)
-    .style("fill", function(d, i) {
-      if(d.nodeType == 'domain') {
-        return 'red';
+    .append(function(v) {
+      return document.createElementNS('http://www.w3.org/2000/svg', v.nodeElType);
+    })
+    .attr('r', function(v) {
+      return v.nodeWeight ? v.nodeWeight*4 : 25;
+    })
+    .style('fill', function(v, i) {
+      if(v.nodeType == 'domain') {
+        return 'darkgreen';
       }
       else {
-        return 'green';
+        return 'url(#' + v.nodeName + ')';
       }
     })
     .call(force.drag);
 
-    // Interactive Data Visualization for the Web
-    // by Scott Murray
-    // Published by O'Reilly Media, Inc., 2013
-    force.on("tick", function() {
+  // Interactive Data Visualization for the Web
+  // by Scott Murray
+  // Published by O'Reilly Media, Inc., 2013
+  force.on('tick', function() {
+    edges.attr('x1', function(v) { return v.source.x; })
+    .attr('y1', function(v) { return v.source.y; })
+    .attr('x2', function(v) { return v.target.x; })
+    .attr('y2', function(v) { return v.target.y; });
 
-    edges.attr("x1", function(d) { return d.source.x; })
-         .attr("y1", function(d) { return d.source.y; })
-         .attr("x2", function(d) { return d.target.x; })
-         .attr("y2", function(d) { return d.target.y; });
-
-    nodes.attr("cx", function(d) { return d.x; })
-         .attr("cy", function(d) { return d.y; });
-
-   });
+    // http://stackoverflow.com/questions/17853985/how-do-i-change-circular-to-rectangular-node-in-d3-force-layout
+     nodes.attr('cx', function(v) { return v.nodeElType == 'circle' ? v.x : null; })
+     .attr('cy', function(v) { return v.nodeElType == 'circle' ? v.y : null; })
+     .attr('x', function(v) { return v.nodeElType == 'rect' ? v.x : null; })
+     .attr('y', function(v) { return v.nodeElType == 'rect' ? v.y : null; })
+  });
 
   // Derived from:
   // http://www.d3noob.org/2013/01/adding-tooltips-to-d3js-graph.html

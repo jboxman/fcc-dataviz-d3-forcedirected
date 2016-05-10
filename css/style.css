@@ -1,9 +1,13 @@
+body {
+  background: #F5F5F5;
+}
 #chart {
   margin: 10px;
   text-align: center;
 }
 svg {
   border: solid 1px black;
+  background-color: #FFF;
 }
 .node-item {
   cursor: pointer;
